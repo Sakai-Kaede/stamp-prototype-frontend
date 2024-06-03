@@ -1,18 +1,31 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import './TimeLine.css'
 import Share from '../share/Share'
 import Post from '../post/Post'
-import {Posts} from "../../dummyData"
+import axios from "axios"
+// import {Posts} from "../../dummyData"
 
 export default function TimeLine() {
+  const [posts, setPosts] = useState([]);
+  useEffect(() => {
+    // 無名関数にasyncはつけられない
+    const fetchPosts = async() => {
+      const response = await axios.get("/posts/timeline/6642c21b9fe01f5810fcec38");
+      // console.log(response);
+      setPosts(response.data);
+    };
+    fetchPosts();
+  }, [])
+
   return (
     <div className='timeline'>
       <div className='timelineWrapper'>
         <Share />
-        {Posts.map((post) => (
+        {posts.map((post) => (
           <Post post={post} key={post.id} />
         ))}
       </div>
     </div>
   )
 }
+
