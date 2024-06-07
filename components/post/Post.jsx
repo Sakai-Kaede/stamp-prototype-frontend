@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react'
 import './Post.css'
 import { MoreVert } from '@mui/icons-material'
 import axios from 'axios'
+import { format } from "timeago.js"
 // import { Users } from "../../dummyData"
 
 export default function Post({post}) {
   const PUBLIC_FOLDER = process.env.REACT_APP_PUBLIC_FOLDER;
 
-  const [like, setLike] = useState(post.like);
+  const [like, setLike] = useState(post.likes.length);
   const [isLiked, setIsLiked] = useState(false);
 
   const handleLike = () => {
@@ -33,7 +34,7 @@ export default function Post({post}) {
           <div className='postTopLeft'>
             <img src={ user.profilePicture || PUBLIC_FOLDER + '/person/noAvatar.png' } alt="" className='postProfileImg' />
             <span className='postUsername'>{ user.username }</span>
-            <span className='postDate'>{post.date}</span>
+            <span className='postDate'>{format(post.createdAt)}</span>
           </div>
           <div className='postTopRight'>
             <MoreVert />
