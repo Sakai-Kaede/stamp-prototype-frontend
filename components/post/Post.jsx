@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import './Post.css'
 import { MoreVert } from '@mui/icons-material'
 import axios from 'axios'
 import { format } from "timeago.js"
+import { Link } from 'react-router-dom'
+import { AuthContext } from '../../state/AuthContext'
 // import { Users } from "../../dummyData"
 
 export default function Post({post}) {
@@ -11,7 +13,14 @@ export default function Post({post}) {
   const [like, setLike] = useState(post.likes.length);
   const [isLiked, setIsLiked] = useState(false);
 
-  const handleLike = () => {
+  const {user: currentUser} = useContext(AuthContext);
+
+  const handleLike = async() => {
+    try {
+      await axios.put(`/posts/${post._id}/like`, {userId: currentUser._id});
+    } catch(err) {
+      console.log(err);
+    }
     setLike(isLiked ? like - 1 : like + 1);
     setIsLiked(!isLiked);
   }
@@ -20,19 +29,21 @@ export default function Post({post}) {
   useEffect(() => {
     // 無名関数にasyncはつけられない
     const fetchUser = async() => {
-      const response = await axios.get(`/users/${post.userId}`);
+      const response = await axios.get(`/users?userId=${post.userId}`);
       console.log(response);
       setUser(response.data);
     };
     fetchUser();
-  }, []);
+  }, [post.userId]);
 
   return (
     <div className='post'>
       <div className='postWrapper'>
         <div className='postTop'>
           <div className='postTopLeft'>
-            <img src={ user.profilePicture || PUBLIC_FOLDER + '/person/noAvatar.png' } alt="" className='postProfileImg' />
+            <Link to={`/profile/${user.username}`}>
+              <img src={ user.profilePicture ?  PUBLIC_FOLDER + user.profilePicture : PUBLIC_FOLDER + '/person/noAvatar.png' } alt="" className='postProfileImg' />
+            </Link>
             <span className='postUsername'>{ user.username }</span>
             <span className='postDate'>{format(post.createdAt)}</span>
           </div>
